@@ -4,27 +4,23 @@ import (
 	botApi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
 	"os"
-	"varmeego-telegram-bot/varmeego-telegram-sample1/commit"
+	"varmeego-telegram-bot/varmeego-telegram-sample1/command"
+	"varmeego-telegram-bot/varmeego-telegram-sample1/env"
 )
 
-const (
-	varmeegoBotToken = "6599882879:AAH_Sv9BnYEBN9SmqX-8EqUDBdaZk_8_ZmI"
-	space            = 9
-)
-
-var commits = []commit.Command{
+var commits = []command.Command{
 	{
 		"help",
-		"Help",
+		"Help menu list all commands",
 		nil,
 	},
 	{
 		"start",
-		"Hello",
+		"Hello world",
 		nil,
 	},
 }
-var helpText = commit.HelpText{
+var helpText = command.HelpText{
 	Header: "This bot commands are:",
 	Body:   commits,
 	Footer: `"/help <command>" get more information.`,
@@ -34,7 +30,7 @@ func main() {
 	checkCommits(&commits)
 	envToken, isFull := os.LookupEnv("TELEGRAM_API_TOKEN")
 	if !isFull {
-		envToken = varmeegoBotToken
+		envToken = env.Environment.TelegramApiToken
 	}
 	bot := newBot(envToken)
 	updateConfig := botApi.NewUpdate(0)
@@ -65,7 +61,7 @@ func handleCommit(update botApi.Update) botApi.MessageConfig {
 	replyMessage := botApi.NewMessage(update.Message.Chat.ID, "")
 	switch update.Message.Command() {
 	case commits[0].Instruction:
-		replyMessage.Text = commit.Help(&helpText, space)
+		replyMessage.Text = command.Help(&helpText, env.Environment.Space)
 	case commits[1].Instruction:
 		replyMessage.Text = "Hello " + update.Message.From.FirstName
 	default:
@@ -73,10 +69,10 @@ func handleCommit(update botApi.Update) botApi.MessageConfig {
 	}
 	return replyMessage
 }
-func checkCommits(commits *[]commit.Command) {
+func checkCommits(commits *[]command.Command) {
 	for _, c := range *commits {
-		if len(c.Instruction) > space-1 {
-			panic("Introduce is too long")
+		if len(c.Instruction) > env.Environment.Space-1 {
+			panic("Instruction is too long")
 		}
 	}
 }
