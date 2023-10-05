@@ -15,10 +15,10 @@ var Environment Env
 
 func init() {
 	_ = godotenv.Load()
-	atoi, _ := strconv.Atoi(os.Getenv("SPACE"))
+	i, _ := strconv.Atoi(os.Getenv("SPACE"))
 
 	Environment = Env{
 		TelegramApiToken: os.Getenv("TELEGRAM_API_TOKEN"),
-		Space:            atoi,
+		Space:            i,
 	}
 }
