@@ -1,0 +1,22 @@
+# Builder
+FROM golang:1.21-alpine as builder
+RUN apk add --no-cache git
+ARG MAIN_NAME="bot"
+ARG PROJECT_PATH="/telegram-bot-sample"
+ARG BUILD_PATH="/build/bot"
+COPY go.mod $PROJECT_PATH/
+COPY go.sum $PROJECT_PATH/
+COPY .env $PROJECT_PATH/
+RUN cd $PROJECT_PATH && go mod download
+ADD . $PROJECT_PATH
+RUN cd $PROJECT_PATH && go build -o .$BUILD_PATH/$MAIN_NAME
+
+# Final
+FROM alpine:latest
+ARG RESOURCE_PATH="/resource"
+ARG MAIN_NAME="bot"
+ARG PROJECT_PATH="/telegram-bot-sample"
+ARG BUILD_PATH="/build/bot"
+COPY --from=builder $PROJECT_PATH$BUILD_PATH/$MAIN_NAME /usr/local/bin/
+COPY --from=builder $PROJECT_PATH/.env /usr/local/bin/
+EXPOSE 5432

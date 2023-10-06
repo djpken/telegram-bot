@@ -1,4 +1,4 @@
-module telegram-bot/telegram-sample1
+module telegram-bot/telegram-sample
 
 go 1.21.1
 

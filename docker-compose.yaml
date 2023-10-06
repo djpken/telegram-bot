@@ -1,0 +1,41 @@
+version: "1.0.0"
+services:
+    telegram-bot-postgres:
+        build:
+            context: ./telegram-bot-postgres
+            dockerfile: ./dockerfile
+        image: telegram-bot-postgres
+        container_name: telegram-bot-postgres
+        restart: always
+        env_file:
+            -   ./telegram-bot-postgres/.env
+        volumes:
+            - postgres-data:${PGDATA}
+        ports:
+              - 5432:5432
+    telegram-bot-postgres-admin:
+        image: dpage/pgadmin4
+        container_name: telegram-bot-postgres-admin
+        restart: always
+        environment:
+            PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+            PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+            PGADMIN_PORT: ${PGADMIN_PORT}
+        ports:
+            - 8080:80
+        volumes:
+            - pgadmin-data:${PGADMIN_DATA}
+    telegram-bot:
+        build:
+            context: ./telegram-bot-sample
+            dockerfile: ./dockerfile
+        image: telegram-bot
+        container_name: telegram-bot
+        env_file:
+            -   ./telegram-bot-sample/.env
+        volumes:
+            - telegram-bot-data:${TELEGRAM_BOT_DATA}
+volumes:
+    postgres-data:
+    telegram-bot-data:
+    pgadmin-data:

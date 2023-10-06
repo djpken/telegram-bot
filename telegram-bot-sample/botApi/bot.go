@@ -3,9 +3,9 @@ package botApi
 import (
 	telegramBotApi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
-	"telegram-bot/telegram-sample1/app"
-	"telegram-bot/telegram-sample1/command"
-	"telegram-bot/telegram-sample1/env"
+	"telegram-bot/telegram-sample/app"
+	"telegram-bot/telegram-sample/command"
+	"telegram-bot/telegram-sample/env"
 )
 
 func init() {
