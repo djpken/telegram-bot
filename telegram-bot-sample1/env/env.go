@@ -2,6 +2,7 @@ package env
 
 import (
 	"github.com/joho/godotenv"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -11,6 +12,7 @@ type Env struct {
 	TelegramApiToken string
 	Space            int
 	Dsn              string
+	Schema           string
 }
 
 var Environment = new(Env)
@@ -30,5 +32,7 @@ func init() {
 		TelegramApiToken: os.Getenv("TELEGRAM_API_TOKEN"),
 		Space:            i,
 		Dsn:              builder.String(),
+		Schema:           os.Getenv("DATABASE_SCHEMA"),
 	}
+	log.Println("[App] Environment initialized")
 }

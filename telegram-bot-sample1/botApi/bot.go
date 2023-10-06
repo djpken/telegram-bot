@@ -14,14 +14,14 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	app.App.TelegramBot = *bot
+	app.App.TelegramBot = bot
 }
 func GetUpdateConfig(offset int, timeout int) telegramBotApi.UpdateConfig {
 	updateConfig := telegramBotApi.NewUpdate(offset)
 	updateConfig.Timeout = timeout
 	return updateConfig
 }
-func GetUpdates(telegramBot telegramBotApi.BotAPI, config telegramBotApi.UpdateConfig) telegramBotApi.UpdatesChannel {
+func GetUpdates(telegramBot *telegramBotApi.BotAPI, config telegramBotApi.UpdateConfig) telegramBotApi.UpdatesChannel {
 	return telegramBot.GetUpdatesChan(config)
 }
 
@@ -57,7 +57,7 @@ func checkCommits(commits *[]command.Command) {
 }
 func ListenUpdates(updates telegramBotApi.UpdatesChannel) {
 	for update := range updates {
-		go handleUpdate(&app.App.TelegramBot, update)
+		go handleUpdate(app.App.TelegramBot, update)
 	}
 }
 
