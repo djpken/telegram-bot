@@ -19,4 +19,3 @@ ARG PROJECT_PATH="/telegram-bot-sample"
 ARG BUILD_PATH="/build/bot"
 COPY --from=builder $PROJECT_PATH$BUILD_PATH/$MAIN_NAME /usr/local/bin/
 COPY --from=builder $PROJECT_PATH/.env /usr/local/bin/
-EXPOSE 5432
