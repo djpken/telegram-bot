@@ -1,6 +1,6 @@
 package model
 
-import "telegram-bot/telegram-sample/model/base"
+import "telegram-bot/telegram-bot-main/model/base"
 
 type Uri struct {
 	base.Id

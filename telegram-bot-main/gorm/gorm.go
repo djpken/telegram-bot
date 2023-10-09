@@ -5,9 +5,9 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 	"log"
-	"telegram-bot/telegram-sample/app"
-	"telegram-bot/telegram-sample/env"
-	"telegram-bot/telegram-sample/model"
+	"telegram-bot/telegram-bot-main/app"
+	"telegram-bot/telegram-bot-main/env"
+	"telegram-bot/telegram-bot-main/model"
 )
 
 func init() {

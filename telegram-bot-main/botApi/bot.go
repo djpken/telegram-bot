@@ -3,18 +3,20 @@ package botApi
 import (
 	telegramBotApi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
-	"telegram-bot/telegram-sample/app"
-	"telegram-bot/telegram-sample/command"
-	"telegram-bot/telegram-sample/env"
+	"telegram-bot/telegram-bot-main/app"
+	"telegram-bot/telegram-bot-main/command"
+	"telegram-bot/telegram-bot-main/env"
 )
 
 func init() {
 	checkCommits(&commits)
+	log.Println("[App] Commits checked")
 	bot, err := telegramBotApi.NewBotAPI(env.Environment.TelegramApiToken)
 	if err != nil {
 		panic(err)
 	}
 	app.App.TelegramBot = bot
+	log.Println("[App] Bot initialized")
 }
 func GetUpdateConfig(offset int, timeout int) telegramBotApi.UpdateConfig {
 	updateConfig := telegramBotApi.NewUpdate(offset)

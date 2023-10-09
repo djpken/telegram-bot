@@ -1,10 +1,10 @@
 package main
 
 import (
-	"telegram-bot/telegram-sample/app"
-	"telegram-bot/telegram-sample/botApi"
-	_ "telegram-bot/telegram-sample/env"
-	_ "telegram-bot/telegram-sample/gorm"
+	"telegram-bot/telegram-bot-main/app"
+	"telegram-bot/telegram-bot-main/botApi"
+	_ "telegram-bot/telegram-bot-main/env"
+	_ "telegram-bot/telegram-bot-main/gorm"
 )
 
 func main() {
