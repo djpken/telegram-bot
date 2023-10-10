@@ -3,7 +3,6 @@ services:
   telegram-bot-postgres:
     build:
       context: ./telegram-bot-postgres
-      dockerfile: ./dockerfile
     image: telegram-bot-postgres
     container_name: telegram-bot-postgres
     restart: always
@@ -30,18 +29,12 @@ services:
   telegram-bot-main:
     build:
       context: ./telegram-bot-main
-      dockerfile: ./dockerfile
     image: telegram-bot-main
     container_name: telegram-bot-main
     volumes:
       - main-data:${TELEGRAM_BOT_DATA}
     environment:
-      - DOCKER_COMPOSE_POSTGRES_USER=${POSTGRES_USER}
-      - DOCKER_COMPOSE_POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - DOCKER_COMPOSE_POSTGRES_HOST=${NETWORK_POSTGRES}
-      - DOCKER_COMPOSE_POSTGRES_PORT=${POSTGRES_PORT}
-      - DOCKER_COMPOSE_POSTGRES_DATABASE=${POSTGRES_DATABASE}
-      - DOCKER_COMPOSE_POSTGRES_SCHEMA=${POSTGRES_SCHEMA}
+      - DATABASE_HOST=${NETWORK_POSTGRES}
 networks:
   postgres-network:
     driver: bridge

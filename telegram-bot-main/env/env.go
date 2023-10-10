@@ -18,16 +18,29 @@ type Env struct {
 var Environment = new(Env)
 
 func init() {
-	_ = godotenv.Load()
+	mode := os.Getenv("TELEGRAM_BOT_MODE")
+	if mode == "test" {
+		_ = godotenv.Load(".env.test")
+	}
+	if mode == "prod" {
+		_ = godotenv.Load(".env.prod")
+	}
+	if mode != "test" && mode != "prod" {
+		err := godotenv.Load(".env.dev")
+		if err != nil {
+			log.Fatal("Error loading .env.dev file")
+		}
+		mode = "dev"
+	}
 	var dsn strings.Builder
 	telegramApiToken := os.Getenv("TELEGRAM_API_TOKEN")
 	i, _ := strconv.Atoi(os.Getenv("SPACE"))
-	host := isEmptyElse("DOCKER_COMPOSE_POSTGRES_HOST", "DATABASE_HOST")
-	port := isEmptyElse("DOCKER_COMPOSE_POSTGRES_PORT", "DATABASE_PORT")
-	database := isEmptyElse("DOCKER_COMPOSE_POSTGRES_DATABASE", "DATABASE_DATABASE")
-	schema := isEmptyElse("DOCKER_COMPOSE_POSTGRES_SCHEMA", "DATABASE_SCHEMA")
-	user := isEmptyElse("DOCKER_COMPOSE_POSTGRES_USER", "DATABASE_USER")
-	password := isEmptyElse("DOCKER_COMPOSE_POSTGRES_PASSWORD", "DATABASE_PASSWORD")
+	host := os.Getenv("DATABASE_HOST")
+	port := os.Getenv("DATABASE_PORT")
+	database := os.Getenv("DATABASE_DATABASE")
+	schema := os.Getenv("DATABASE_SCHEMA")
+	user := os.Getenv("DATABASE_USER")
+	password := os.Getenv("DATABASE_PASSWORD")
 	properties := os.Getenv("DATABASE_PROPERTIES")
 	dsn.WriteString("host=" + host + " ")
 	dsn.WriteString("port=" + port + " ")
@@ -41,12 +54,5 @@ func init() {
 		Dsn:              dsn.String(),
 		Schema:           schema,
 	}
-	log.Println("[App] Environment initialized")
-}
-func isEmptyElse(dockerComposeEnv string, localEnv string) string {
-	env := os.Getenv(dockerComposeEnv)
-	if env == "" {
-		return os.Getenv(localEnv)
-	}
-	return env
+	log.Printf("[App] Environment %s initialized\n", mode)
 }
