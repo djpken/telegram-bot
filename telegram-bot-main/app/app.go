@@ -2,25 +2,31 @@ package app
 
 import (
 	telegramBotApi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
 type application struct {
 	TelegramBot *telegramBotApi.BotAPI
-	Gorm        *gorm.DB
+	DB          *gorm.DB
+	Cache       *redis.Client
 }
 
 var App = new(application)
 
 func (app *application) DisConnect() {
-	if app.Gorm == nil {
+	if app.DB == nil {
 		return
 	}
-	db, err := app.Gorm.DB()
+	db, err := app.DB.DB()
 	if err != nil {
 		panic(err)
 	}
 	err = db.Close()
+	if err != nil {
+		panic(err)
+	}
+	err = app.Cache.Close()
 	if err != nil {
 		panic(err)
 	}

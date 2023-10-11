@@ -1,4 +1,4 @@
-package gorm
+package db
 
 import (
 	"gorm.io/driver/postgres"
@@ -11,21 +11,31 @@ import (
 )
 
 func init() {
+	config := env.Environment.DB
 	postgresConfig := postgres.Config{
-		DSN: env.Environment.Dsn,
+		DSN: config.Dsn,
 	}
 	gormConfig := &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
-			TablePrefix:   env.Environment.Schema + ".",
+			TablePrefix:   config.Schema + ".",
 			SingularTable: true},
 	}
 	db, err := gorm.Open(postgres.New(postgresConfig), gormConfig)
 	if err != nil {
 		panic(err)
 	}
-	app.App.Gorm = db
+	app.App.DB = db
 	log.Println("[App] Database connected")
-	err = db.AutoMigrate(&model.User{}, &model.Uri{})
+	err = db.AutoMigrate(
+		&model.Helper{},
+		&model.Command{},
+		&model.Arg{},
+		&model.Uri{},
+		&model.User{},
+		&model.Role{},
+		&model.Menu{},
+		&model.Setting{},
+	)
 	if err != nil {
 		panic(err)
 	}

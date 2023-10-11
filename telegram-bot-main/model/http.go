@@ -3,9 +3,7 @@ package model
 import "telegram-bot/telegram-bot-main/model/base"
 
 type Uri struct {
-	base.Id
-	Path     string `json:"path" gorm:"DEFAULT:'';not null"`
-	Interval int    `json:"interval" gorm:"DEFAULT:0;not null"`
-	base.TimeStamps
-	base.DeleteAt
+	base.Model
+	Path     string `db:"type:varchar(255);default:''"`
+	Interval int    `db:"DEFAULT:0;not null"`
 }

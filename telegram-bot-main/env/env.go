@@ -8,16 +8,39 @@ import (
 	"strings"
 )
 
+type DB struct {
+	Dsn    string
+	Schema string
+}
+type Cache struct {
+	Host     string
+	Port     string
+	Password string
+	DB       int
+}
+
 type Env struct {
 	TelegramApiToken string
 	Space            int
-	Dsn              string
-	Schema           string
+	DB               DB
+	Cache            Cache
 }
 
 var Environment = new(Env)
 
 func init() {
+	mode := getMode()
+	telegramApiToken := os.Getenv("TELEGRAM_API_TOKEN")
+	i, _ := strconv.Atoi(os.Getenv("SPACE"))
+	Environment = &Env{
+		TelegramApiToken: telegramApiToken,
+		Space:            i,
+		DB:               *getDB(),
+		Cache:            *getCache(),
+	}
+	log.Printf("[App] Environment %s initialized\n", mode)
+}
+func getMode() string {
 	mode := os.Getenv("TELEGRAM_BOT_MODE")
 	if mode == "test" {
 		_ = godotenv.Load(".env.test")
@@ -32,12 +55,13 @@ func init() {
 		}
 		mode = "dev"
 	}
+	return mode
+}
+func getDB() *DB {
 	var dsn strings.Builder
-	telegramApiToken := os.Getenv("TELEGRAM_API_TOKEN")
-	i, _ := strconv.Atoi(os.Getenv("SPACE"))
 	host := os.Getenv("DATABASE_HOST")
 	port := os.Getenv("DATABASE_PORT")
-	database := os.Getenv("DATABASE_DATABASE")
+	databaseName := os.Getenv("DATABASE_NAME")
 	schema := os.Getenv("DATABASE_SCHEMA")
 	user := os.Getenv("DATABASE_USER")
 	password := os.Getenv("DATABASE_PASSWORD")
@@ -46,13 +70,24 @@ func init() {
 	dsn.WriteString("port=" + port + " ")
 	dsn.WriteString("user=" + user + " ")
 	dsn.WriteString("password=" + password + " ")
-	dsn.WriteString("dbname=" + database + " ")
+	dsn.WriteString("dbname=" + databaseName + " ")
 	dsn.WriteString(properties)
-	Environment = &Env{
-		TelegramApiToken: telegramApiToken,
-		Space:            i,
-		Dsn:              dsn.String(),
-		Schema:           schema,
+	config := &DB{
+		Dsn:    dsn.String(),
+		Schema: schema,
 	}
-	log.Printf("[App] Environment %s initialized\n", mode)
+	return config
+}
+func getCache() *Cache {
+	database, err := strconv.Atoi(os.Getenv("CACHE_DATABASE"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	config := &Cache{
+		Host:     os.Getenv("CACHE_HOST"),
+		Port:     os.Getenv("CACHE_PORT"),
+		Password: os.Getenv("CACHE_PASSWORD"),
+		DB:       database,
+	}
+	return config
 }

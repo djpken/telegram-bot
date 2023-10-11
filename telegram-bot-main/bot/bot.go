@@ -1,15 +1,15 @@
-package botApi
+package bot
 
 import (
+	"context"
 	telegramBotApi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
 	"telegram-bot/telegram-bot-main/app"
-	"telegram-bot/telegram-bot-main/command"
 	"telegram-bot/telegram-bot-main/env"
 )
 
 func init() {
-	checkCommits(&commits)
+	//checkCommits(&commits)
 	log.Println("[App] Commits checked")
 	bot, err := telegramBotApi.NewBotAPI(env.Environment.TelegramApiToken)
 	if err != nil {
@@ -37,12 +37,19 @@ func handleUpdate(bot *telegramBotApi.BotAPI, update telegramBotApi.Update) {
 	log.Printf("Message from %d: %s", update.Message.Chat.ID, replyMessage.Text)
 	_, _ = bot.Send(replyMessage)
 }
+
 func handleCommit(update telegramBotApi.Update) telegramBotApi.MessageConfig {
+	var cache = app.App.Cache
+	var ctx = context.Background()
 	replyMessage := telegramBotApi.NewMessage(update.Message.Chat.ID, "")
 	switch update.Message.Command() {
-	case commits[0].Instruction:
-		replyMessage.Text = command.Help(&helpText, env.Environment.Space)
-	case commits[1].Instruction:
+	case "help":
+		result, err := cache.Get(ctx, "help").Result()
+		if err != nil {
+			panic(err)
+		}
+		replyMessage.Text = result
+	case "hello":
 		replyMessage.Text = "Hello " + update.Message.From.FirstName
 	default:
 		replyMessage.Text = "No such command!!!"
@@ -50,33 +57,15 @@ func handleCommit(update telegramBotApi.Update) telegramBotApi.MessageConfig {
 	return replyMessage
 }
 
-func checkCommits(commits *[]command.Command) {
-	for _, c := range *commits {
-		if len(c.Instruction) > env.Environment.Space-1 {
-			panic("Instruction is too long")
-		}
-	}
-}
+//	func checkCommits(commits *[]command.Command) {
+//		for _, c := range *commits {
+//			if len(c.Instruction) > env.Environment.Space-1 {
+//				panic("Instruction is too long")
+//			}
+//		}
+//	}
 func ListenUpdates(updates telegramBotApi.UpdatesChannel) {
 	for update := range updates {
 		go handleUpdate(app.App.TelegramBot, update)
 	}
-}
-
-var commits = []command.Command{
-	{
-		"help",
-		"Help menu list all commands",
-		nil,
-	},
-	{
-		"start",
-		"Hello world",
-		nil,
-	},
-}
-var helpText = command.HelpText{
-	Header: "This bot commands are:",
-	Body:   commits,
-	Footer: `Use /help <command> get more information.`,
 }
