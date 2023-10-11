@@ -78,5 +78,5 @@ var commits = []command.Command{
 var helpText = command.HelpText{
 	Header: "This bot commands are:",
 	Body:   commits,
-	Footer: `"help <command>" get more information.`,
+	Footer: `Use /help <command> get more information.`,
 }

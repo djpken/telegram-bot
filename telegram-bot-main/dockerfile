@@ -5,7 +5,9 @@ ARG PROJECT_PATH="/telegram-bot-main"
 ARG BUILD_PATH="/build/bot"
 COPY go.mod $PROJECT_PATH/
 COPY go.sum $PROJECT_PATH/
-COPY .env $PROJECT_PATH/
+COPY .env.dev $PROJECT_PATH/
+COPY .env.prod $PROJECT_PATH/
+COPY .env.test $PROJECT_PATH/
 RUN cd $PROJECT_PATH && go mod download
 ADD . $PROJECT_PATH
 RUN cd $PROJECT_PATH && go build -o .$BUILD_PATH/bot
@@ -16,5 +18,7 @@ ARG RESOURCE_PATH="/resource"
 ARG PROJECT_PATH="/telegram-bot-main"
 ARG BUILD_PATH="/build/bot"
 COPY --from=builder $PROJECT_PATH$BUILD_PATH/bot /usr/local/bin/
-COPY --from=builder $PROJECT_PATH/.env /
+COPY --from=builder $PROJECT_PATH/.env.dev /
+COPY --from=builder $PROJECT_PATH/.env.prod /
+COPY --from=builder $PROJECT_PATH/.env.test /
 CMD ["/usr/local/bin/bot"]

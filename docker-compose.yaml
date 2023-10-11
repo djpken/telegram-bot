@@ -1,18 +1,31 @@
 version: "1.0.0"
 services:
+  telegram-bot-main:
+    build:
+      context: ./telegram-bot-main
+      dockerfile: ./dockerfile
+    image: telegram-bot-main
+    container_name: telegram-bot-main
+    volumes:
+      - main-data:/var/lib/telegram-bot-data/data
+    environment:
+      - DATABASE_HOST=telegram-bot-postgres
+      - TELEGRAM_BOT_MODE=prod
+    links:
+      - telegram-bot-postgres
   telegram-bot-postgres:
     build:
       context: ./telegram-bot-postgres
+      dockerfile: ./dockerfile
     image: telegram-bot-postgres
     container_name: telegram-bot-postgres
     restart: always
+    environment:
+      - PGDATA=/var/lib/postgresql/data
     volumes:
-      - postgres-data:${PGDATA}
+      - postgres-data:/var/lib/postgresql/data
     ports:
       - 5432:5432/tcp
-    networks:
-      postgres-network:
-        ipv4_address: ${NETWORK_POSTGRES}
   telegram-bot-pgadmin:
     image: dpage/pgadmin4
     container_name: telegram-bot-pgadmin
@@ -23,26 +36,9 @@ services:
     ports:
       - 8888:80/tcp
     volumes:
-      - pgadmin-data:${PGADMIN_DATA}
+      - pgadmin-data:/var/lib/pgadmin/data
     links:
-      - "telegram-bot-postgres:pgsql-server"
-  telegram-bot-main:
-    build:
-      context: ./telegram-bot-main
-    image: telegram-bot-main
-    container_name: telegram-bot-main
-    volumes:
-      - main-data:${TELEGRAM_BOT_DATA}
-    environment:
-      - DATABASE_HOST=${NETWORK_POSTGRES}
-networks:
-  postgres-network:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: ${NETWORK_SUBNET}
-          gateway: ${NETWORK_GATEWAY}
+        - telegram-bot-postgres
 
 volumes:
   main-data:
