@@ -57,13 +57,6 @@ func handleCommit(update telegramBotApi.Update) telegramBotApi.MessageConfig {
 	return replyMessage
 }
 
-//	func checkCommits(commits *[]command.Command) {
-//		for _, c := range *commits {
-//			if len(c.Instruction) > env.Environment.Space-1 {
-//				panic("Instruction is too long")
-//			}
-//		}
-//	}
 func ListenUpdates(updates telegramBotApi.UpdatesChannel) {
 	for update := range updates {
 		go handleUpdate(app.App.TelegramBot, update)
