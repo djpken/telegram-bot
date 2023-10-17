@@ -27,8 +27,9 @@ func init() {
 	app.App.DB = db
 	log.Println("[App] Database connected")
 	err = db.AutoMigrate(
-		&model.Helper{},
 		&model.Command{},
+		&model.CommandType{},
+		&model.Helper{},
 		&model.Arg{},
 		&model.Uri{},
 		&model.User{},

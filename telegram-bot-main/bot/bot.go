@@ -8,6 +8,11 @@ import (
 	"telegram-bot/telegram-bot-main/env"
 )
 
+const (
+	HELLO = "hello"
+	HELP  = "help"
+)
+
 func init() {
 	//checkCommits(&commits)
 	log.Println("[App] Commits checked")
@@ -43,14 +48,14 @@ func handleCommit(update telegramBotApi.Update) telegramBotApi.MessageConfig {
 	var ctx = context.Background()
 	replyMessage := telegramBotApi.NewMessage(update.Message.Chat.ID, "")
 	switch update.Message.Command() {
-	case "help":
-		result, err := cache.Get(ctx, "help").Result()
+	case HELLO:
+		replyMessage.Text = "Hello " + update.Message.From.FirstName
+	case HELP:
+		result, err := cache.Get(ctx, HELP).Result()
 		if err != nil {
 			panic(err)
 		}
 		replyMessage.Text = result
-	case "hello":
-		replyMessage.Text = "Hello " + update.Message.From.FirstName
 	default:
 		replyMessage.Text = "No such command!!!"
 	}
