@@ -29,7 +29,6 @@ func init() {
 	err = db.AutoMigrate(
 		&model.Command{},
 		&model.CommandType{},
-		&model.Helper{},
 		&model.Arg{},
 		&model.Uri{},
 		&model.User{},
