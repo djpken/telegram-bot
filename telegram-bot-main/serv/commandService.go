@@ -1,46 +1,50 @@
 package dao
 
 import (
-	"context"
 	"github.com/redis/go-redis/v9"
+	"gorm.io/gorm"
 	"log"
 	"strings"
-	"telegram-bot/telegram-bot-main/app"
+	"telegram-bot/telegram-bot-main/cache"
 	"telegram-bot/telegram-bot-main/constant"
+	"telegram-bot/telegram-bot-main/dao"
 )
 
 type CommandService struct {
-	Cache app.Cacher
-	Ctx   context.Context
+	cache      cache.Cacher
+	commandDao *dao.CommandDao
+	name       string
 }
 
-func NewCommandService(cache app.Cacher, ctx context.Context) *CommandService {
-	return &CommandService{Cache: cache, Ctx: ctx}
+func NewCommandService(cache cache.Cacher, db *gorm.DB) *CommandService {
+	commandDao := dao.NewCommandDao(db)
+	return &CommandService{cache: cache, commandDao: commandDao, name: "commandService"}
 }
-
-const serviceName = "commandService"
 
 func (cs *CommandService) GetCommandHelperByCommandType(commandType string) (string, error) {
-	stringWriter := strings.Builder{}
-	key := serviceName + ":" + commandType
+	key := cs.name + ":" + commandType
 
-	result, err := cs.Cache.Get(cs.Ctx, key).Result()
-	if err == redis.Nil { // cache miss
-		list, err := commandDao.GetCommandByCommandType(commandType)
-		if err != nil {
-			return "", err
-		}
-		for _, h := range list {
-			stringWriter.WriteString(h.String() + "\n")
-		}
-		cs.Cache.Set(cs.Ctx, key, stringWriter.String(), 0)
-	} else if err != nil { // other cache errors
+	result, err := cs.cache.Get(key)
+	if err == nil {
+		s := constant.MiddleInCommandType(commandType, result)
+		return s, nil
+	}
+	if err != redis.Nil {
 		log.Println(err)
 		return "", err
-	} else {
-		stringWriter.WriteString(result)
 	}
 
+	//Handle cache miss
+	stringWriter := strings.Builder{}
+	list, err := cs.commandDao.GetCommandByCommandType(commandType)
+	if err != nil {
+		return "", err
+	}
+	for _, h := range list {
+		stringWriter.WriteString(h.String() + "\n")
+	}
+	err = cs.cache.Set(key, stringWriter.String(), 0)
+	stringWriter.WriteString(result)
 	s := constant.MiddleInCommandType(commandType, stringWriter.String())
 	return s, nil
 }

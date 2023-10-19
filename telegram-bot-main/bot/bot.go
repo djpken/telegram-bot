@@ -1,11 +1,11 @@
 package bot
 
 import (
-	"context"
 	telegramBotApi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
 	"telegram-bot/telegram-bot-main/app"
 	"telegram-bot/telegram-bot-main/env"
+	dao "telegram-bot/telegram-bot-main/serv"
 )
 
 const (
@@ -13,15 +13,15 @@ const (
 	HELP  = "help"
 )
 
-func init() {
+func NewBot() *telegramBotApi.BotAPI {
 	//checkCommits(&commits)
 	log.Println("[App] Commits checked")
 	bot, err := telegramBotApi.NewBotAPI(env.Environment.TelegramApiToken)
 	if err != nil {
 		panic(err)
 	}
-	app.App.TelegramBot = bot
 	log.Println("[App] Bot initialized")
+	return bot
 }
 func GetUpdateConfig(offset int, timeout int) telegramBotApi.UpdateConfig {
 	updateConfig := telegramBotApi.NewUpdate(offset)
@@ -32,38 +32,37 @@ func GetUpdates(telegramBot *telegramBotApi.BotAPI, config telegramBotApi.Update
 	return telegramBot.GetUpdatesChan(config)
 }
 
-func handleUpdate(bot *telegramBotApi.BotAPI, update telegramBotApi.Update) {
+func handleUpdate(sys *app.Application, update telegramBotApi.Update) {
 	replyMessage := telegramBotApi.NewMessage(update.Message.Chat.ID, "")
 	if update.Message.IsCommand() {
-		replyMessage = handleCommit(update)
+		replyMessage = handleCommit(sys, update)
 	} else {
 		replyMessage.Text = update.Message.Text
 	}
 	log.Printf("Message from %d: %s", update.Message.Chat.ID, replyMessage.Text)
-	_, _ = bot.Send(replyMessage)
+	_, _ = sys.TelegramBot.Send(replyMessage)
 }
 
-func handleCommit(update telegramBotApi.Update) telegramBotApi.MessageConfig {
-	var cache = app.App.Cache
-	var ctx = context.Background()
+func handleCommit(sys *app.Application, update telegramBotApi.Update) telegramBotApi.MessageConfig {
+	service := dao.NewCommandService(sys.Cache, sys.DB)
 	replyMessage := telegramBotApi.NewMessage(update.Message.Chat.ID, "")
 	switch update.Message.Command() {
 	case HELLO:
 		replyMessage.Text = "Hello " + update.Message.From.FirstName
 	case HELP:
-		result, err := cache.Get(ctx, HELP).Result()
+		str, err := service.GetCommandHelperByCommandType(HELP)
 		if err != nil {
-			panic(err)
+			replyMessage.Text = err.Error()
 		}
-		replyMessage.Text = result
+		replyMessage.Text = str
 	default:
 		replyMessage.Text = "No such command!!!"
 	}
 	return replyMessage
 }
 
-func ListenUpdates(updates telegramBotApi.UpdatesChannel) {
+func ListenUpdates(sys *app.Application, updates telegramBotApi.UpdatesChannel) {
 	for update := range updates {
-		go handleUpdate(app.App.TelegramBot, update)
+		go handleUpdate(sys, update)
 	}
 }

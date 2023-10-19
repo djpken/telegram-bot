@@ -8,7 +8,6 @@ import (
 	"time"
 )
 
-// Cacher 定義了一個快取的接口
 type Cacher interface {
 	Get(key string) (string, error)
 	Set(key string, value string, expiration time.Duration) error
@@ -17,22 +16,22 @@ type Cacher interface {
 
 type RedisCache struct {
 	Client *redis.Client
+	Ctx    context.Context
 }
 
 func (r *RedisCache) Get(key string) (string, error) {
-	return r.Client.Get(context.Background(), key).Result()
+	return r.Client.Get(r.Ctx, key).Result()
 }
 
 func (r *RedisCache) Set(key string, value string, expiration time.Duration) error {
-	return r.Client.Set(context.Background(), key, value, expiration).Err()
+	return r.Client.Set(r.Ctx, key, value, expiration).Err()
 }
 
 func (r *RedisCache) Close() error {
 	return r.Client.Close()
 }
 
-// NewRedisCache 創建一個新的 RedisCache 實例
-func NewRedisCache() Cacher {
+func NewRedisCache(ctx context.Context) Cacher {
 	config := env.Environment.Cache
 	cache := redis.NewClient(&redis.Options{
 		Addr:     config.Host + ":" + config.Port,
@@ -40,15 +39,16 @@ func NewRedisCache() Cacher {
 		DB:       config.DB,
 	})
 
-	// 在這裡檢查連接是否正確，並返回錯誤（如果有的話）是個好主意。
-	_, err := cache.Ping(context.Background()).Result()
+	// 在這裡檢查連接是否正確，並返回錯誤（如果有的話）
+	_, err := cache.Ping(ctx).Result()
 	if err != nil {
-		log.Fatalf("Could not connect to Redis: %v", err) // 或者您可以選擇返回錯誤而不是使用 log.Fatalf
+		panic(err)
 	}
 
 	log.Println("[App] Cache initialized")
-	return &RedisCache{Client: cache}
-}
 
-// 在您的主程式或初始化部分，您可以這樣使用：
-// app.App.Cache = cache.NewRedisCache()
+	return &RedisCache{
+		Client: cache,
+		Ctx:    ctx,
+	}
+}

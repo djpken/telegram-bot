@@ -5,12 +5,11 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 	"log"
-	"telegram-bot/telegram-bot-main/app"
 	"telegram-bot/telegram-bot-main/env"
 	"telegram-bot/telegram-bot-main/model"
 )
 
-func init() {
+func NewDataBase() *gorm.DB {
 	config := env.Environment.DB
 	postgresConfig := postgres.Config{
 		DSN: config.Dsn,
@@ -24,7 +23,6 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	app.App.DB = db
 	log.Println("[App] Database connected")
 	err = db.AutoMigrate(
 		&model.Command{},
@@ -40,4 +38,5 @@ func init() {
 		panic(err)
 	}
 	log.Println("[App] Database autoMigrated")
+	return db
 }
