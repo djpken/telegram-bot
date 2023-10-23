@@ -1,5 +1,4 @@
-REMIND
-=
+# REMIND
 
 1. docker-compose docker  goBuild
     + go build

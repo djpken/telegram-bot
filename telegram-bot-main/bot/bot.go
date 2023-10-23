@@ -28,8 +28,8 @@ func GetUpdateConfig(offset int, timeout int) telegramBotApi.UpdateConfig {
 	updateConfig.Timeout = timeout
 	return updateConfig
 }
-func GetUpdates(telegramBot *telegramBotApi.BotAPI, config telegramBotApi.UpdateConfig) telegramBotApi.UpdatesChannel {
-	return telegramBot.GetUpdatesChan(config)
+func GetUpdates(app *app.Application, config telegramBotApi.UpdateConfig) telegramBotApi.UpdatesChannel {
+	return app.TelegramBot.GetUpdatesChan(config)
 }
 
 func handleUpdate(sys *app.Application, update telegramBotApi.Update) {

@@ -10,9 +10,7 @@ import (
 )
 
 func main() {
-
 	sys := app.NewApplication(bot.NewBot(), db.NewDataBase(), cache.NewRedisCache(context.Background()))
-
 	telegramBot := sys.TelegramBot
 	updates := bot.GetUpdates(telegramBot, bot.GetUpdateConfig(0, 60))
 	bot.ListenUpdates(sys, updates)
