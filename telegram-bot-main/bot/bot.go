@@ -2,20 +2,16 @@ package bot
 
 import (
 	telegramBotApi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"gorm.io/gorm"
 	"log"
-	"telegram-bot/telegram-bot-main/app"
+	"telegram-bot/telegram-bot-main/cache"
+	"telegram-bot/telegram-bot-main/constant/command"
+	command2 "telegram-bot/telegram-bot-main/constant/commnadType"
 	"telegram-bot/telegram-bot-main/env"
 	dao "telegram-bot/telegram-bot-main/serv"
 )
 
-const (
-	HELLO = "hello"
-	HELP  = "help"
-)
-
 func NewBot() *telegramBotApi.BotAPI {
-	//checkCommits(&commits)
-	log.Println("[App] Commits checked")
 	bot, err := telegramBotApi.NewBotAPI(env.Environment.TelegramApiToken)
 	if err != nil {
 		panic(err)
@@ -28,41 +24,52 @@ func GetUpdateConfig(offset int, timeout int) telegramBotApi.UpdateConfig {
 	updateConfig.Timeout = timeout
 	return updateConfig
 }
-func GetUpdates(app *app.Application, config telegramBotApi.UpdateConfig) telegramBotApi.UpdatesChannel {
-	return app.TelegramBot.GetUpdatesChan(config)
+func GetUpdates(bot *telegramBotApi.BotAPI, config telegramBotApi.UpdateConfig) telegramBotApi.UpdatesChannel {
+	return bot.GetUpdatesChan(config)
 }
 
-func handleUpdate(sys *app.Application, update telegramBotApi.Update) {
+func handleUpdate(bot *telegramBotApi.BotAPI, cacher cache.Cacher, db *gorm.DB, update telegramBotApi.Update) {
 	replyMessage := telegramBotApi.NewMessage(update.Message.Chat.ID, "")
 	if update.Message.IsCommand() {
-		replyMessage = handleCommit(sys, update)
+		replyMessage = handleCommit(cacher, db, update)
 	} else {
 		replyMessage.Text = update.Message.Text
 	}
 	log.Printf("Message from %d: %s", update.Message.Chat.ID, replyMessage.Text)
-	_, _ = sys.TelegramBot.Send(replyMessage)
+	_, _ = bot.Send(replyMessage)
 }
 
-func handleCommit(sys *app.Application, update telegramBotApi.Update) telegramBotApi.MessageConfig {
-	service := dao.NewCommandService(sys.Cache, sys.DB)
+func handleCommit(cacher cache.Cacher, db *gorm.DB, update telegramBotApi.Update) telegramBotApi.MessageConfig {
+	service := dao.NewCommandService(cacher, db)
 	replyMessage := telegramBotApi.NewMessage(update.Message.Chat.ID, "")
-	switch update.Message.Command() {
-	case HELLO:
-		replyMessage.Text = "Hello " + update.Message.From.FirstName
-	case HELP:
-		str, err := service.GetCommandHelperByCommandType(HELP)
-		if err != nil {
-			replyMessage.Text = err.Error()
-		}
-		replyMessage.Text = str
+	switch command.NewEnum(update.Message.Command()) {
+	case command.HELLO:
+		handleHello(service, &replyMessage, &update)
+	case command.HELP:
+		handleHelp(service, &replyMessage, &update)
+	case command.HTTP:
+		handleHttp(service, &replyMessage, &update)
 	default:
 		replyMessage.Text = "No such command!!!"
 	}
 	return replyMessage
 }
 
-func ListenUpdates(sys *app.Application, updates telegramBotApi.UpdatesChannel) {
+func ListenUpdates(bot *telegramBotApi.BotAPI, cacher cache.Cacher, db *gorm.DB, updates telegramBotApi.UpdatesChannel) {
 	for update := range updates {
-		go handleUpdate(sys, update)
+		go handleUpdate(bot, cacher, db, update)
 	}
+}
+func handleHello(service *dao.CommandService, replyMessage *telegramBotApi.MessageConfig, update *telegramBotApi.Update) {
+	replyMessage.Text = "Hello " + update.Message.From.FirstName
+}
+func handleHelp(service *dao.CommandService, replyMessage *telegramBotApi.MessageConfig, update *telegramBotApi.Update) {
+	str, err := service.GetCommandHelperByCommandType(command2.BASIC)
+	if err != nil {
+		replyMessage.Text = err.Error()
+	} else {
+		replyMessage.Text = str
+	}
+}
+func handleHttp(service *dao.CommandService, replyMessage *telegramBotApi.MessageConfig, update *telegramBotApi.Update) {
 }

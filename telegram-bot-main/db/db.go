@@ -25,14 +25,11 @@ func NewDataBase() *gorm.DB {
 	}
 	log.Println("[App] Database connected")
 	err = db.AutoMigrate(
-		&model.Command{},
-		&model.CommandType{},
-		&model.Arg{},
 		&model.Uri{},
 		&model.User{},
 		&model.Role{},
 		&model.Menu{},
-		&model.Setting{},
+		&model.Config{},
 	)
 	if err != nil {
 		panic(err)

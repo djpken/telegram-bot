@@ -11,10 +11,9 @@ import (
 
 func main() {
 	sys := app.NewApplication(bot.NewBot(), db.NewDataBase(), cache.NewRedisCache(context.Background()))
-	telegramBot := sys.TelegramBot
-	updates := bot.GetUpdates(telegramBot, bot.GetUpdateConfig(0, 60))
-	bot.ListenUpdates(sys, updates)
 	defer func() {
 		_ = sys.Disconnect()
 	}()
+	updates := bot.GetUpdates(sys.TelegramBot, bot.GetUpdateConfig(0, 60))
+	bot.ListenUpdates(sys.TelegramBot, sys.Cache, sys.DB, updates)
 }

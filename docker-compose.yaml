@@ -7,7 +7,7 @@ services:
     image: telegram-bot-main
     container_name: telegram-bot-main
     volumes:
-      main-data: /var/lib/telegram-bot-data/data
+      - main-data:/var/lib/telegram-bot-data/data
     environment:
       DATABASE_HOST: telegram-bot-postgres
       TELEGRAM_BOT_MODE: prod
@@ -23,7 +23,7 @@ services:
     environment:
       PGDATA: /var/lib/postgresql/data
     volumes:
-      postgres-data: /var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
     ports:
       - 5432:5432/tcp
   telegram-bot-pgadmin:
@@ -36,7 +36,7 @@ services:
     ports:
       - 8888:80/tcp
     volumes:
-      pgadmin-data: /var/lib/pgadmin/data
+      - pgadmin-data:/var/lib/pgadmin/data
     links:
         - telegram-bot-postgres
 volumes:

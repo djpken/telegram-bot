@@ -44,9 +44,12 @@ func NewRedisCache(ctx context.Context) Cacher {
 	if err != nil {
 		panic(err)
 	}
+	err = cache.FlushDB(ctx).Err()
+	if err != nil {
+		panic(err)
+	}
 
 	log.Println("[App] Cache initialized")
-
 	return &RedisCache{
 		Client: cache,
 		Ctx:    ctx,
