@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="LeetcodeEditor">
+    <option name="projectConfig">
+      <map>
+        <entry key="$USER_HOME$/AppData/Local/Temp/leetcode/editor/en/[704]Binary Search.go">
+          <value>
+            <LeetcodeEditor>
+              <option name="contentPath" value="$USER_HOME$/leetcode/leetcode/editor/en/doc/content/704.Binary Search/solution_test.md" />
+              <option name="frontendQuestionId" value="leetcode.com704" />
+              <option name="host" value="leetcode.com" />
+              <option name="path" value="$USER_HOME$/leetcode/leetcode/editor/en/704.Binary Search/solution_test.go" />
+              <option name="titleSlug" value="binary-search" />
+            </LeetcodeEditor>
+          </value>
+        </entry>
+        <entry key="$USER_HOME$/leetcode/leetcode/editor/en/704.Binary Search/solution_test.go">
+          <value>
+            <LeetcodeEditor>
+              <option name="contentPath" value="$USER_HOME$/leetcode/leetcode/editor/en/doc/content/704.Binary Search/solution_test.md" />
+              <option name="frontendQuestionId" value="leetcode.com704" />
+              <option name="host" value="leetcode.com" />
+              <option name="path" value="$USER_HOME$/leetcode/leetcode/editor/en/704.Binary Search/solution_test.go" />
+              <option name="titleSlug" value="binary-search" />
+            </LeetcodeEditor>
+          </value>
+        </entry>
+        <entry key="$USER_HOME$/leetcode/leetcode/editor/en/[704]Binary Search.go">
+          <value>
+            <LeetcodeEditor>
+              <option name="contentPath" value="$USER_HOME$/leetcode/leetcode/editor/en/doc/content/704.Binary Search/solution_test.md" />
+              <option name="frontendQuestionId" value="leetcode.com704" />
+              <option name="host" value="leetcode.com" />
+              <option name="path" value="$USER_HOME$/leetcode/leetcode/editor/en/704.Binary Search/solution_test.go" />
+              <option name="titleSlug" value="binary-search" />
+            </LeetcodeEditor>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

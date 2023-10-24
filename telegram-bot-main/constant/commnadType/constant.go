@@ -26,9 +26,9 @@ var listMap = map[Enum]value{
 		header: "Basic command list",
 		footer: "/help <command> show help",
 		commands: []command.Enum{
-			command.HELLO,
-			command.HELP,
-			command.HTTP,
+			command.Hello,
+			command.Help,
+			command.Http,
 		},
 	},
 }

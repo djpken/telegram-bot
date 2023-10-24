@@ -4,11 +4,12 @@ import (
 	telegramBotApi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"gorm.io/gorm"
 	"log"
+	"regexp"
 	"telegram-bot/telegram-bot-main/cache"
 	"telegram-bot/telegram-bot-main/constant/command"
-	command2 "telegram-bot/telegram-bot-main/constant/commnadType"
+	"telegram-bot/telegram-bot-main/constant/commnadType"
 	"telegram-bot/telegram-bot-main/env"
-	dao "telegram-bot/telegram-bot-main/serv"
+	serv "telegram-bot/telegram-bot-main/serv"
 )
 
 func NewBot() *telegramBotApi.BotAPI {
@@ -40,36 +41,55 @@ func handleUpdate(bot *telegramBotApi.BotAPI, cacher cache.Cacher, db *gorm.DB, 
 }
 
 func handleCommit(cacher cache.Cacher, db *gorm.DB, update telegramBotApi.Update) telegramBotApi.MessageConfig {
-	service := dao.NewCommandService(cacher, db)
+	service := serv.NewCommandService(cacher, db)
 	replyMessage := telegramBotApi.NewMessage(update.Message.Chat.ID, "")
-	switch command.NewEnum(update.Message.Command()) {
-	case command.HELLO:
+	words := camelCaseToWords(update.Message.Command())
+	switch command.NewEnum(words[0]) {
+	case command.Hello:
 		handleHello(service, &replyMessage, &update)
-	case command.HELP:
-		handleHelp(service, &replyMessage, &update)
-	case command.HTTP:
-		handleHttp(service, &replyMessage, &update)
+	case command.Help:
+		handleHelp(service, &replyMessage, &update, words)
+	case command.Http:
+		handleHttp(service, &replyMessage, &update, words)
+	case command.Todo:
+		handleTodo(service, &replyMessage, &update, words)
 	default:
 		replyMessage.Text = "No such command!!!"
 	}
 	return replyMessage
 }
 
+func camelCaseToWords(input string) []string {
+	re := regexp.MustCompile("[A-Z][a-z]*|[a-z]+")
+	return re.FindAllString(input, -1)
+}
 func ListenUpdates(bot *telegramBotApi.BotAPI, cacher cache.Cacher, db *gorm.DB, updates telegramBotApi.UpdatesChannel) {
 	for update := range updates {
 		go handleUpdate(bot, cacher, db, update)
 	}
 }
-func handleHello(service *dao.CommandService, replyMessage *telegramBotApi.MessageConfig, update *telegramBotApi.Update) {
+func handleHello(service *serv.CommandService, replyMessage *telegramBotApi.MessageConfig, update *telegramBotApi.Update) {
 	replyMessage.Text = "Hello " + update.Message.From.FirstName
 }
-func handleHelp(service *dao.CommandService, replyMessage *telegramBotApi.MessageConfig, update *telegramBotApi.Update) {
-	str, err := service.GetCommandHelperByCommandType(command2.BASIC)
+func handleHelp(service *serv.CommandService, replyMessage *telegramBotApi.MessageConfig, update *telegramBotApi.Update, strings []string) {
+	str, err := service.GetCommandHelperByCommandType(commnadType.BASIC)
 	if err != nil {
 		replyMessage.Text = err.Error()
 	} else {
 		replyMessage.Text = str
 	}
 }
-func handleHttp(service *dao.CommandService, replyMessage *telegramBotApi.MessageConfig, update *telegramBotApi.Update) {
+func handleHttp(service *serv.CommandService, replyMessage *telegramBotApi.MessageConfig, update *telegramBotApi.Update, strings []string) {
+	replyMessage.Text = update.Message.CommandArguments()
+}
+func handleTodo(service *serv.CommandService, replyMessage *telegramBotApi.MessageConfig, update *telegramBotApi.Update, strings []string) {
+	todo := command.Todo
+	args :=
+	if len(strings) < 2 {
+		replyMessage.Text = todo.GetFormat()
+	}
+	switch strings[1] {
+	case
+
+	}
 }
