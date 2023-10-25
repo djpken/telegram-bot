@@ -1,12 +1,14 @@
 package commnadType
 
 import (
+	"fmt"
 	"strings"
 	"telegram-bot/telegram-bot-main/constant/command"
 )
 
 type Enum int
 
+const Nil Enum = -1
 const (
 	BASIC Enum = iota
 )
@@ -24,12 +26,14 @@ type value struct {
 var listMap = map[Enum]value{
 	BASIC: {
 		header: "Basic command list",
-		footer: "/help <command> show help",
+		footer: "Basic command list",
 		commands: []command.Enum{
 			command.Hello,
 			command.Help,
 			command.Http,
 			command.Todo,
+			command.Open,
+			command.Close,
 		},
 	},
 }
@@ -42,9 +46,12 @@ func NewEnum(str string) Enum {
 	}
 	return Enum(-1) // Return an invalid enum value to indicate not found.
 }
-func (e Enum) String() string {
-	if e < 0 || int(e) >= len(list) {
-		return "UNKNOWN"
+func (e Enum) Command() string {
+	if e == -1 {
+		return "Nil"
+	}
+	if int(e) >= len(list) {
+		return fmt.Sprintf("Use %d out array length %d", int(e), len(list))
 	}
 	return list[e]
 }
@@ -53,17 +60,23 @@ func (e Enum) getValue() value {
 }
 
 func (e Enum) GetFormat() string {
-	commands := e.getValue().commands
+	v := e.getValue()
+	commands := v.commands
 	stringWriter := strings.Builder{}
+
 	for _, h := range commands {
-		stringWriter.WriteString(h.GetRow() + "\n")
+		stringWriter.WriteString(h.GetCommandRow() + "\n")
 	}
-	return e.getValue().format(stringWriter.String())
-}
-func (v value) format(middle string) string {
+
+	middle := stringWriter.String()
+
 	var builder strings.Builder
 	builder.WriteString(v.header + "\n\n")
-	builder.WriteString(middle + "\n")
+	builder.WriteString(middle)
+	if len(middle) > 0 {
+		builder.WriteString("\n")
+	}
 	builder.WriteString(v.footer)
+
 	return builder.String()
 }

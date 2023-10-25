@@ -13,10 +13,10 @@ type TodoService struct {
 }
 
 func NewTodoService(cache cache.Cacher, db *gorm.DB) *TodoService {
-	return &TodoService{cache: cache, commandDao: dao.NewTodoDao(db), name: "todoService"}
+	return &TodoService{cache: cache, todoDao: dao.NewTodoDao(db), name: "todoService"}
 }
 
 func (cs *TodoService) GetAll() string {
 	cs.todoDao.GetAll()
-
+	return ""
 }

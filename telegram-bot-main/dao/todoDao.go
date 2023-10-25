@@ -13,5 +13,5 @@ func NewTodoDao(db *gorm.DB) *TodoDao {
 	return &TodoDao{db: db, name: "todoDao"}
 }
 func (t *TodoDao) GetAll() string {
-	return
+	return ""
 }
