@@ -41,18 +41,19 @@ func handleUpdate(bot *telegramBotApi.BotAPI, cacher cache.Cacher, db *gorm.DB, 
 }
 
 func handleCommit(cacher cache.Cacher, db *gorm.DB, update telegramBotApi.Update) telegramBotApi.MessageConfig {
-	service := serv.NewCommandService(cacher, db)
+	commandService := serv.NewCommandService(cacher, db)
+	todoService := serv.NewTodoService(cacher, db)
 	replyMessage := telegramBotApi.NewMessage(update.Message.Chat.ID, "")
 	words := camelCaseToWords(update.Message.Command())
 	switch command.NewEnum(words[0]) {
 	case command.Hello:
-		handleHello(service, &replyMessage, &update)
+		handleHello(&replyMessage, &update)
 	case command.Help:
-		handleHelp(service, &replyMessage, &update, words)
+		handleHelp(commandService, &replyMessage, &update, words)
 	case command.Http:
-		handleHttp(service, &replyMessage, &update, words)
+		handleHttp(commandService, &replyMessage, &update, words)
 	case command.Todo:
-		handleTodo(service, &replyMessage, &update, words)
+		handleTodo(todoService, &replyMessage, &update, words)
 	default:
 		replyMessage.Text = "No such command!!!"
 	}
@@ -68,7 +69,7 @@ func ListenUpdates(bot *telegramBotApi.BotAPI, cacher cache.Cacher, db *gorm.DB,
 		go handleUpdate(bot, cacher, db, update)
 	}
 }
-func handleHello(service *serv.CommandService, replyMessage *telegramBotApi.MessageConfig, update *telegramBotApi.Update) {
+func handleHello(replyMessage *telegramBotApi.MessageConfig, update *telegramBotApi.Update) {
 	replyMessage.Text = "Hello " + update.Message.From.FirstName
 }
 func handleHelp(service *serv.CommandService, replyMessage *telegramBotApi.MessageConfig, update *telegramBotApi.Update, strings []string) {
@@ -82,14 +83,16 @@ func handleHelp(service *serv.CommandService, replyMessage *telegramBotApi.Messa
 func handleHttp(service *serv.CommandService, replyMessage *telegramBotApi.MessageConfig, update *telegramBotApi.Update, strings []string) {
 	replyMessage.Text = update.Message.CommandArguments()
 }
-func handleTodo(service *serv.CommandService, replyMessage *telegramBotApi.MessageConfig, update *telegramBotApi.Update, strings []string) {
+func handleTodo(todoService *serv.TodoService, replyMessage *telegramBotApi.MessageConfig, update *telegramBotApi.Update, strings []string) {
 	todo := command.Todo
-	args :=
-	if len(strings) < 2 {
+	if len(strings) != 2 {
 		replyMessage.Text = todo.GetFormat()
 	}
-	switch strings[1] {
-	case
-
+	switch command.NewEnum(strings[1]) {
+	case command.List:
+		replyMessage.Text = todoService.GetAll()
+	case command.Create:
+	case command.Update:
+	case command.Delete:
 	}
 }

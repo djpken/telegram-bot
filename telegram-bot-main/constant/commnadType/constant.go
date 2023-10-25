@@ -29,6 +29,7 @@ var listMap = map[Enum]value{
 			command.Hello,
 			command.Help,
 			command.Http,
+			command.Todo,
 		},
 	},
 }

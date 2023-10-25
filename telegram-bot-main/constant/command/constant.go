@@ -57,9 +57,9 @@ var listMap = map[Enum]value{
 		footer:    "todo",
 		args: map[Enum]string{
 			List:   "list all todo",
-			Create: "create todo",
-			Update: "update todo",
-			Delete: "delete todo",
+			Create: "Create todo",
+			Update: "Update todo",
+			Delete: "Delete todo",
 		},
 	},
 }
@@ -87,6 +87,9 @@ func (e Enum) GetRow() string {
 }
 func (e Enum) GetFormat() string {
 	c := e.getValue()
+	if c.args == nil {
+		return ""
+	}
 
 	var builder strings.Builder
 	builder.WriteString(c.header + "\n\n")
