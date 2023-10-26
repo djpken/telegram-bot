@@ -33,7 +33,9 @@ var listMap = map[Enum]value{
 			command.Http,
 			command.Todo,
 			command.Open,
+			command.InlineOpen,
 			command.Close,
+			command.InlineClose,
 		},
 	},
 }

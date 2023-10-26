@@ -14,7 +14,9 @@ const (
 	Http
 	Todo
 	Open
+	InlineOpen
 	Close
+	InlineClose
 	List
 	Create
 	Update
@@ -27,7 +29,9 @@ var list = []string{
 	"http",
 	"todo",
 	"open",
+	"inlineOpen",
 	"close",
+	"inlineClose",
 	"list",
 	"create",
 	"update",
@@ -73,6 +77,18 @@ var listMap = map[Enum]value{
 			Update: "Update todo",
 			Delete: "Delete todo",
 		},
+	},
+	Open: {
+		introduce: "open keyboard",
+	},
+	InlineOpen: {
+		introduce: "open inline keyboard",
+	},
+	Close: {
+		introduce: "close keyboard",
+	},
+	InlineClose: {
+		introduce: "close inline keyboard",
 	},
 }
 

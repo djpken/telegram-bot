@@ -44,7 +44,7 @@ func handleCommand(cacher cache.Cacher, db *gorm.DB, update tgBotApi.Update) tgB
 	todoService := serv.NewTodoService(cacher, db)
 	replyMessage := tgBotApi.NewMessage(update.Message.Chat.ID, "")
 	words := camelCaseToWords(update.Message.Command())
-	switch command.NewEnum(words[0]) {
+	switch command.NewEnum(update.Message.Command()) {
 	case command.Hello:
 		handleHello(&replyMessage, &update)
 	case command.Help:
@@ -54,16 +54,24 @@ func handleCommand(cacher cache.Cacher, db *gorm.DB, update tgBotApi.Update) tgB
 	case command.Todo:
 		handleTodo(todoService, &replyMessage, &update, words)
 	case command.Open:
-		handleOpen(todoService, &replyMessage, &update, words)
+		handleOpenKeyBoard(todoService, &replyMessage, &update, words)
+	case command.InlineOpen:
+		handleOpenInlineKeyboard(todoService, &replyMessage, &update, words)
 	case command.Close:
-		handleClose(&replyMessage, &update, words)
+		handleCloseKeyBoard(&replyMessage, &update, words)
+	case command.InlineClose:
+		handleCloseInlineKeyboard(&replyMessage, &update, words)
 	default:
 		replyMessage.Text = "No such command!!!"
 	}
 	return replyMessage
 }
 
-func handleClose(m *tgBotApi.MessageConfig, t *tgBotApi.Update, words []string) {
+func handleCloseInlineKeyboard(m *tgBotApi.MessageConfig, t *tgBotApi.Update, words []string) {
+	m.Text = "Close inline keyboard"
+}
+
+func handleCloseKeyBoard(m *tgBotApi.MessageConfig, t *tgBotApi.Update, words []string) {
 	m.ReplyMarkup = tgBotApi.ReplyKeyboardRemove{
 		RemoveKeyboard: true,
 	}
@@ -75,17 +83,11 @@ var inlineKeyboard = tgBotApi.NewInlineKeyboardMarkup(
 		tgBotApi.NewInlineKeyboardButtonURL("1.com", "http://1.com"),
 		tgBotApi.NewInlineKeyboardButtonData("2", "2"),
 		tgBotApi.NewInlineKeyboardButtonSwitch("3", "3"),
-		tgBotApi.InlineKeyboardButton{
-			Text: "switch_inline_query_current_chat(1,4)",
-		},
 	),
 	tgBotApi.NewInlineKeyboardRow(
 		tgBotApi.NewInlineKeyboardButtonData("4", "4"),
 		tgBotApi.NewInlineKeyboardButtonData("5", "5"),
 		tgBotApi.NewInlineKeyboardButtonSwitch("6", "6"),
-		tgBotApi.InlineKeyboardButton{
-			Text: "switch_inline_query_current_chat(1,4)",
-		},
 	),
 )
 var keyboard = tgBotApi.NewReplyKeyboard(
@@ -114,9 +116,14 @@ func handleReplyMsg(cacher cache.Cacher, db *gorm.DB, update tgBotApi.Update) tg
 	return replyMessage
 }
 
-func handleOpen(service *serv.TodoService, m *tgBotApi.MessageConfig, t *tgBotApi.Update, words []string) {
+func handleOpenKeyBoard(service *serv.TodoService, m *tgBotApi.MessageConfig, t *tgBotApi.Update, words []string) {
 	m.ReplyMarkup = keyboard
 	m.Text = "Test open key board"
+	return
+}
+func handleOpenInlineKeyboard(service *serv.TodoService, m *tgBotApi.MessageConfig, t *tgBotApi.Update, words []string) {
+	m.ReplyMarkup = inlineKeyboard
+	m.Text = "Test open inline keyboard"
 	return
 }
 
