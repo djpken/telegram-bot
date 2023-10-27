@@ -26,19 +26,17 @@ type Env struct {
 	Cache            Cache
 }
 
-var Environment = new(Env)
-
-func init() {
+func NewEnv() *Env {
 	mode := getMode()
 	telegramApiToken := os.Getenv("TELEGRAM_API_TOKEN")
 	i, _ := strconv.Atoi(os.Getenv("SPACE"))
-	Environment = &Env{
+	log.Printf("[App] Environment %s initialized\n", mode)
+	return &Env{
 		TelegramApiToken: telegramApiToken,
 		Space:            i,
 		DB:               *getDB(),
 		Cache:            *getCache(),
 	}
-	log.Printf("[App] Environment %s initialized\n", mode)
 }
 func getMode() string {
 	mode := os.Getenv("TELEGRAM_BOT_MODE")

@@ -8,8 +8,8 @@ import (
 	"telegram-bot/telegram-bot-main/env"
 )
 
-func NewBot() *tgBotApi.BotAPI {
-	bot, err := tgBotApi.NewBotAPI(env.Environment.TelegramApiToken)
+func NewBot(env *env.Env) *tgBotApi.BotAPI {
+	bot, err := tgBotApi.NewBotAPI(env.TelegramApiToken)
 	if err != nil {
 		panic(err)
 	}

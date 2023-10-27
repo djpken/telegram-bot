@@ -9,8 +9,8 @@ import (
 	"telegram-bot/telegram-bot-main/model"
 )
 
-func NewDataBase() *gorm.DB {
-	config := env.Environment.DB
+func NewDataBase(env *env.Env) *gorm.DB {
+	config := env.DB
 	postgresConfig := postgres.Config{
 		DSN: config.Dsn,
 	}

@@ -31,8 +31,8 @@ func (r *RedisCache) Close() error {
 	return r.Client.Close()
 }
 
-func NewRedisCache(ctx context.Context) Cacher {
-	config := env.Environment.Cache
+func NewRedisCache(env *env.Env, ctx context.Context) Cacher {
+	config := env.Cache
 	cache := redis.NewClient(&redis.Options{
 		Addr:     config.Host + ":" + config.Port,
 		Password: config.Password,
