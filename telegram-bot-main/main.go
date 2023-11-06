@@ -2,11 +2,11 @@ package main
 
 import (
 	"telegram-bot/telegram-bot-main/bot"
-	_ "telegram-bot/telegram-bot-main/env"
+	"telegram-bot/telegram-bot-main/wire"
 )
 
 func main() {
-	sys, err := InitializeApp()
+	sys, err := wire.InitializeApp()
 	if err != nil {
 		panic(err)
 	}

@@ -29,7 +29,7 @@ func (app *Application) Disconnect() error {
 		if err != nil {
 			errs = append(errs, err.Error())
 		}
-		if err := db.Close(); err != nil {
+		if err = db.Close(); err != nil {
 			errs = append(errs, err.Error())
 		}
 	}

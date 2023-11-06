@@ -4,7 +4,7 @@
 //go:build !wireinject
 // +build !wireinject
 
-package main
+package wire
 
 import (
 	"context"
@@ -16,10 +16,6 @@ import (
 	"telegram-bot/telegram-bot-main/cache"
 	"telegram-bot/telegram-bot-main/db"
 	"telegram-bot/telegram-bot-main/env"
-)
-
-import (
-	_ "telegram-bot/telegram-bot-main/env"
 )
 
 // Injectors from wire.go:
